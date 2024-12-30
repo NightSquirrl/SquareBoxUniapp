@@ -1,0 +1,22 @@
+<template>
+	<div>
+		<component :is="targetComponent"></component>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { onLoad } from '@dcloudio/uni-app';
+import { ref, shallowRef } from 'vue';
+import toolsPageConfig from '../../config/toolsPageConfig';
+const toolType = ref('');
+const targetComponent = shallowRef()
+onLoad((options) => {
+	toolType.value = options.toolTitle;
+	targetComponent.value = toolsPageConfig[toolType.value]
+	uni.setNavigationBarTitle({
+		title: toolType.value
+	});
+});
+</script>
+
+<style></style>

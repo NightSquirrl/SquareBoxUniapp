@@ -1,0 +1,48 @@
+<template>
+	<scroll-view class="scroll-view-content" scroll-y="true">
+		<view>
+			<uni-card v-for="classifyCardItem in classifyCardConfig" :key="classifyCardItem.cardTitle" :title="classifyCardItem.cardTitle" class="classify-card">
+				<div v-for="tool in classifyCardItem.tools" @click="turnToTool(tool)" class="tool-item-wrap">
+					<uni-icons custom-prefix="iconfont" :type="tool.icon" size="30"></uni-icons>
+					<text>{{tool.toolsTitle}}</text>
+				</div>
+			</uni-card>
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="ts">
+import classifyCardConfig from '../../config/classifyCardConfig';
+
+function turnToTool(tool) {
+	uni.navigateTo({
+		url: `/pages/toolsPage/toolsPage?toolTitle=${tool.type}`
+	});
+}
+</script>
+
+<style lang="scss" scoped>
+@import '../../uni.scss';
+
+uni-page-wrapper {
+	background-color: $gay-f5;
+}
+
+.scroll-view-content {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	.classify-card {
+		margin: 10px !important;
+		.tool-item-wrap {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background: $gay-f5;
+			width: fit-content;
+			padding: 5px 20px;
+			border-radius: 20px;
+		}
+	}
+}
+</style>
