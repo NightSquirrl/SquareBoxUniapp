@@ -39,29 +39,36 @@
 								<view class="uni-input">{{ item.endAttendance }}</view>
 							</picker>
 						</uni-td>
-						<!-- <uni-td align="center">{{ item.address }}</uni-td> -->
-						<!-- 					<uni-td>
-							<view class="uni-group">
-								<button class="uni-button" size="mini" type="primary">修改</button>
-								<button class="uni-button" size="mini" type="warn">删除</button>
-							</view>
-						</uni-td> -->
 					</uni-tr>
 				</uni-table>
 			</uni-card>
-
+			<!-- 分页 -->
 			<!-- <view class="uni-pagination-box"><uni-pagination show-icon :page-size="pageSize" :current="pageCurrent" :total="total" @change="change" /></view> -->
+			<uni-card title="设置">
+				<view>
+					<text style="margin-bottom: 10px">每天固定休息时间</text>
+					<input :value="restTime" class="uni-border-input" type="digit" placeholder="带小数点的数字键盘" />
+				</view>
+			</uni-card>
+
+			<uni-card title="结果显示">
+				<view>
+					<text style="margin-bottom: 10px">每天固定休息时间</text>
+					<input :value="restTime" class="uni-border-input" type="digit" placeholder="带小数点的数字键盘" />
+				</view>
+			</uni-card>
 		</view>
 	</view>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import { generateDateRange, getDayOfWeek, getEndOfWeek, getStartOfWeek } from '../../utils/Time';
+import { onMounted, ref, watch } from 'vue';
+import { formatDate, generateDateRange, getDayOfWeek, getEndOfWeek, getLastDayOfMonth, getStartOfWeek } from '../../utils/Time';
 
 function selectionChange() {}
 const startDate = ref(getStartOfWeek());
 const endDate = ref(getEndOfWeek());
+const restTime = ref(0);
 const tableData = ref<
 	{
 		attendanceTime: string;
@@ -74,22 +81,53 @@ function bindTimeChange(row, e) {
 	row.attendanceTime = e.detail.value;
 }
 function bindStartDate(e) {
-	startDate.value = e.detail.value;
+	// 开始的时间需要小于结束时间
+	if (new Date(e.detail.value).getTime() - new Date(endDate.value).getTime() < 0) {
+		startDate.value = e.detail.value;
+	}
 }
 function bindEndDate(e) {
-	endDate.value = e.detail.value;
+	const currentDate = new Date(e.detail.value);
+	if (currentDate.getTime() - new Date(startDate.value).getTime() > 0) {
+		// 并且时间不允许超过开始时间的月份
+		if (currentDate.getMonth() === new Date(startDate.value).getMonth()) {
+			endDate.value = e.detail.value;
+		} else {
+			currentDate.setMonth(new Date(startDate.value).getMonth());
+			currentDate.setFullYear(new Date(startDate.value).getFullYear());
+			currentDate.setDate(getLastDayOfMonth(startDate.value));
+			endDate.value = formatDate(currentDate.getTime());
+		}
+	}
 }
+
 watch(
 	() => [startDate, endDate],
 	(newData, oldData) => {
+		//  最后修改本次是否存在数据 ,动态生成
 		tableData.value = generateDateRange(startDate.value, endDate.value);
-		console.log(11);
 	},
 	{
 		immediate: true,
 		deep: true
 	}
 );
+
+onMounted(() => {
+	// 初始化结束时间
+	const tempEndDate = startDate.value;
+	const tempEndDateArray = tempEndDate.split('-');
+	tempEndDateArray[2] = getLastDayOfMonth(startDate.value).toString();
+	endDate.value = tempEndDateArray.join('-');
+	uni.setStorage({
+	  key: 'key',
+	  data: 'value',
+	  success: function () {
+	    // 存储成功的逻辑
+		console.log('success');
+	  }
+	});
+});
 </script>
 
 <style lang="scss" scoped>
@@ -121,5 +159,12 @@ watch(
 
 .uni-table-th {
 	font-size: 12px !important;
+}
+
+.uni-border-input {
+	border: 1px solid $theme-color;
+	height: 40px;
+	border-radius: 10px;
+	padding-left: 20px;
 }
 </style>
