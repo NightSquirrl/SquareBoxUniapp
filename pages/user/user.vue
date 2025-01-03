@@ -1,9 +1,11 @@
 <template>
-	<div>12</div>
+	<view>
+		<LoginNvue />
+	</view>
 </template>
 
-<script>
+<script setup lang="ts">
+import LoginNvue from '../../components/Login/Login.nvue';
 </script>
 
-<style>
-</style>
+<style scoped lang="scss"></style>

@@ -1,0 +1,71 @@
+<template>
+	<uni-card class="login-card" @click="toLogin">
+		<view>
+			<uni-icons custom-prefix="iconfont" type="icon-wode" size="40" color="#ffffff"></uni-icons>
+		</view>
+		<text style="font-size: 20px; color: #ffffff">登录</text>
+		<view>
+			<!-- 普通弹窗 -->
+			<uni-popup :safe-area="true" ref="loginPopupRef" background-color="#fff" @change="loginPopupChange">
+				<view class="login-content">
+					<view class="login-popup-title"><text class="text">欢迎跳进方盒</text></view>
+					<view class="login-form">
+						<uni-easyinput trim="all" v-model="username" placeholder="用户名/手机号/邮箱📮"></uni-easyinput>
+						<uni-easyinput type="password" trim="all" v-model="password" placeholder="8位以上长度"></uni-easyinput>
+					</view>
+				</view>
+			</uni-popup>
+		</view>
+	</uni-card>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const loginPopupRef = ref();
+const username = ref('');
+const password = ref('');
+
+function toLogin() {
+	loginPopupRef.value.open('bottom');
+}
+
+// 显示登录弹窗隐藏登录弹窗=>隐藏显示 tabbar
+function loginPopupChange(e) {
+	if (!e.show) {
+		uni.showTabBar({
+			animation: false
+		});
+	} else {
+		uni.hideTabBar({
+			animation: true
+		});
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.login-card {
+	background-color: $theme-color;
+	height: 100px;
+	opacity: 0.8;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.login-content {
+	height: 80vh;
+	padding: 20px;
+	.login-popup-title {
+		color: #000000;
+		font-size: 20px;
+		font-weight: bolder;
+	}
+	.login-form {
+		margin-top: 20px;
+		height: 120px;
+		display: flex;
+		flex-direction: column;
+	}
+}
+</style>
